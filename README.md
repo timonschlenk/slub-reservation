@@ -10,3 +10,10 @@ Folge den Schritten aus dem Tutorial: [Python Selenium Tutorial - Automate Websi
 2. Gebe ins Terminal ein ``` pip install selenium ```
 3. installiere eine aktuelle Version von Google Chrome und den dazugehörigen [Driver](https://sites.google.com/chromium.org/driver/)
 4. Kopiere die Executable des Drivers in den root Ordner des Projekts und benne sie chromedriver.exe
+5. Füge eine Datei config.json Datei in den Root Ordner hinzu in welcher sich Passwort und Username Enthalten mit folgender Formatierung:
+```json
+{
+   "username": "username",
+   "password": "password"
+}
+```
