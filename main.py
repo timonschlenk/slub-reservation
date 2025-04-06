@@ -18,15 +18,17 @@ excel_path = os.path.join(os.path.dirname(__file__), 'data.xlsx')
 workbook = load_workbook(excel_path)
 sheet = workbook.active
 
-def generate_link(date:str, start_time:str, end_time:str, room_number=20, level_number=1):
+def generate_link(date:str, start_time:str, end_time:str, room_number="0.66"):
     # Generate a link for the reservation page with the given date and time
     formated_start_time = start_time.replace(':', '%3A')
     formated_end_time = end_time.replace(':', '%3A')
     base_url = "https://raumbuchung.slub-dresden.de/Web/reservation/"
-    return f"{base_url}?rid={room_number}&sid={level_number}&rd={date}&sd={date}{formated_start_time}&ed={date}{formated_end_time}"
+    formated_room_number = 18 if room_number == "0.40" else 19 if room_number == "0.42" else 20 if room_number == "0.43" else 21 if room_number == "0.46" else 22 if room_number == "0.47" else 23
+    level_number = 1
+    return f"{base_url}?rid={formated_room_number}&sid={level_number}&rd={date}&sd={date}{formated_start_time}&ed={date}{formated_end_time}"
 
-def make_reservation(date:str, start_time:str, end_time:str, room_number=20, level_number=1, title="Physik Lerngruppe", description="Hausaufgaben", person_count=1):
-    LINK = generate_link(date=date, start_time=start_time, end_time=end_time, room_number=room_number, level_number=level_number)  # Generate the link for the reservation page
+def make_reservation(date:str, start_time:str, end_time:str, room_number=20, title="Physik Lerngruppe", description="Hausaufgaben", person_count=1, pause=1):
+    LINK = generate_link(date=date, start_time=start_time, end_time=end_time, room_number=room_number)  # Generate the link for the reservation page
 
     # Setup Chrome options and service
     service = Service(executable_path='./chromedriver.exe')
@@ -89,28 +91,47 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, lev
     ReservationTermsCheckbox.click()  # Click the privacy checkbox
     SubmitButton2.click()  # Click the submit button
 
-    # Wait for 3 seconds
-    time.sleep(3)
-
+    # Wait for ... seconds
+    time.sleep(pause)
+    sucess = True if driver.find_elements(By.CLASS_NAME, 'success') else False  # Check if the reservation was successful
     # Close the browser
     driver.quit()
+    return sucess  # Return the success status
 
-for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=8, values_only=True):
-    DATE = row[0]               # Column A: Date
-    START_TIME = row[1]         # Column B: Start Time
-    END_TIME = row[2]           # Column C: End Time
-    ROOM_NUMBER = row[3]        # Column D: Room Number
-    LEVEL_NUMBER = row[4]       # Column E: Level Number
-    TITLE = row[5]              # Column F: Title
-    DESCRIPTION = row[6]        # Column G: Description
-    PERSON_COUNT = row[7]       # Column H: Person Count
-    current_date = datetime.now().date()  # Get the current date
+for row_index, row in enumerate(sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=8, values_only=True), start=2):
+
+    DATE = row[0]                           # Column A: Date
+    START_TIME = row[1]                     # Column B: Start Time
+    END_TIME = row[2]                       # Column C: End Time
+    ROOM_NUMBERS = row[3].split("|")        # Column D: Room Number                  # Column E: Level Number
+    TITLE = row[4]                          # Column E: Title
+    DESCRIPTION = row[5]                    # Column F: Description
+    PERSON_COUNT = row[6]                   # Column G: Person Count
+    STATUS = row[7]                         # Column H: Status
+    current_date = datetime.now().date()    # Get the current date
     formated_date = datetime.strptime(DATE, '%Y-%m-%d').date()
     
+    if STATUS in ["Success - Reservation for Room 0.40", "Success - Reservation for Room 0.42", "Success - Reservation for Room 0.43", "Success - Reservation for Room 0.46", "Success - Reservation for Room 0.47","Success - Reservation for Room 0.66", "Failed for all Rooms", "Skipped (Past)", "Skipped (Future)"]:
+        print(f"Skipping row {row_index} with status: {STATUS}")  # Skip rows with these statuses
+        continue
     if (formated_date - current_date).days < 0:
-        print(f"Skipping reservation for {DATE} as it is in the past.")
+        sheet[f"H{row_index}"] = "Skipped (Past)"  # Write status in column H
+        print(f"Skipping row {row_index} with status: Skipped (Past)")  # Skip past dates
         continue
     if (formated_date - current_date).days > 14:
-        print(f"Skipping reservation for {DATE} as it is more than 14 days in the future.")
+        sheet[f"H{row_index}"] = "Skipped (Future)"  # Write status in column H
+        print(f"Skipping row {row_index} with status: Skipped (Future)")
         continue
-    make_reservation(date=DATE, start_time=START_TIME, end_time=END_TIME, room_number=ROOM_NUMBER, level_number=LEVEL_NUMBER, title=TITLE, description=DESCRIPTION, person_count=PERSON_COUNT)  # Call the function to make the reservation
+
+    for ROOM_NUMBER in ROOM_NUMBERS:
+        success = make_reservation(date=DATE, start_time=START_TIME, end_time=END_TIME, room_number=ROOM_NUMBER, title=TITLE, description=DESCRIPTION, person_count=PERSON_COUNT)  # Call the function to make the reservation
+        if success:
+            sheet[f"H{row_index}"] = f"Success - Reservation for Room {ROOM_NUMBER}"  # Write success status in column I
+            print(f"Successfully made reservation for row {row_index} for Room {ROOM_NUMBER}")
+            break  # Break the loop if the reservation was successful
+    if not success:
+        sheet[f"H{row_index}"] = "Failed for all Rooms"  # Write failure status in column H
+        print(f"Failed to make reservation for row {row_index} for all rooms")
+
+# Save the updated Excel file
+workbook.save(excel_path)
