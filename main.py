@@ -19,6 +19,7 @@ excel_path = os.path.join(os.path.dirname(__file__), 'data.xlsx')
 workbook = load_workbook(excel_path)
 sheet = workbook.active
 
+
 def generate_link(date:str, start_time:str, end_time:str, room_number="0.66"):
     # Generate a link for the reservation page with the given date and time
     formated_start_time = start_time.replace(':', '%3A')
