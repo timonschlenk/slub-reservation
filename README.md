@@ -22,3 +22,8 @@ pip install schedule
    "password": "password"
 }
 ```
+6. Füge eine data.xlsx Datei ein Mit folgender Formatierung:
+{
+    DATE|START_TIME|END_TIME|ROOM_NUMBERS|TITLE|DESCRIPTION|PERSONCOUNT|STATUS
+    
+}
