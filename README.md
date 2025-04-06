@@ -10,10 +10,10 @@ Folge den Schritten aus dem Tutorial: [Python Selenium Tutorial - Automate Websi
 2. Installiere Selenium, Schedule und Openpyxl, gebe dafür ins Terminal ein:
 ```terminal
 pip install selenium
-pip install opanpyxl
+pip install openpyxl
 pip install schedule
 ```
-3. Installiere eine aktuelle Version von Google Chrome und den dazugehörigen [Driver](https://sites.google.com/chromium.org/driver/)
+3. Installiere eine aktuelle Version von Google Chrome oder Firefox und den dazugehörigen Driver ([Chrome](https://sites.google.com/chromium.org/driver/), [Firefox](https://github.com/mozilla/geckodriver))
 4. Kopiere die Executable des Drivers in den root Ordner des Projekts und benenne sie ``` chromedriver.exe ```
 5. Füge eine ``` config.json ``` Datei in den Root Ordner hinzu in welcher sich Passwort und Username befinden mit folgender Formatierung:
 ```json
