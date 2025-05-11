@@ -31,7 +31,7 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     LINK = generate_link(date=date, start_time=start_time, end_time=end_time, room_number=room_number)  # Generate the link for the reservation page
 
     # Setup Chrome options and service
-    service = Service(executable_path='./geckodriver.exe')
+    service = Service(executable_path='/usr/lib/chromium-browser/chromedriver')
     options = webdriver.FirefoxOptions()
     options.add_argument('-headless')  # Run in headless mode (no GUI)
     driver = webdriver.Firefox(service=service, options=options)  # Initialize the WebDriver
