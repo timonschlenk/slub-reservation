@@ -7,10 +7,9 @@ Einen Bot mit Pyhton und der Bibliothek Selenium schreiben, der einen mithilfe e
 Folge den Schritten aus dem Tutorial: [Python Selenium Tutorial - Automate Websites and Create Bots](https://www.youtube.com/watch?v=NB8OceGZGjA) oder Befolge folgende Schritte:
 
 1. Installiere eine aktuelle Version von Python
-2. Installiere Selenium, Schedule und Openpyxl, gebe dafür ins Terminal ein:
+2. Installiere Selenium und Schedule gebe dafür ins Terminal ein:
 ```terminal
-pip install selenium
-pip install openpyxl
+pip install seleniumS
 pip install schedule
 ```
 3. Installiere eine aktuelle Version von Google Chrome oder Firefox und den dazugehörigen Driver ([Chrome](https://sites.google.com/chromium.org/driver/), [Firefox](https://github.com/mozilla/geckodriver))
