@@ -11,14 +11,12 @@ import time
 import schedule
 import json
 import os
-from openpyxl import load_workbook  # Import openpyxl to read Excel files
-from datetime import datetime
+from datetime import datetime, timedelta
 
-# Load data from Excel file
-excel_path = os.path.join(os.path.dirname(__file__), 'data.xlsx')
-workbook = load_workbook(excel_path)
-sheet = workbook.active
-
+# Load data from JSON file
+json_path = os.path.join(os.path.dirname(__file__), 'data.json')
+with open(json_path, 'r') as json_file:
+    reservations = json.load(json_file)
 
 def generate_link(date:str, start_time:str, end_time:str, room_number="0.66"):
     # Generate a link for the reservation page with the given date and time
@@ -101,44 +99,60 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     # Close the browser
     driver.quit()
     return sucess  # Return the success status
+    
+def reserve_room(reservation, row_index, DATE:str, START_TIME:str, END_TIME:str, ROOM_NUMBERS:str, TITLE="Physik Lerngruppe", DESCRIPTION="Hausaufgaben", PERSON_COUNT=3):
+    for ROOM_NUMBER in ROOM_NUMBERS:
+        success = make_reservation(date=DATE, start_time=START_TIME, end_time=END_TIME, room_number=ROOM_NUMBER, title=TITLE, description=DESCRIPTION, person_count=PERSON_COUNT)
+        if success:
+            reservation["status"] = f"Success - Reservation for Room {ROOM_NUMBER}"
+            print(f"Successfully made reservation for reservation {row_index} for Room {ROOM_NUMBER}")
+            break
+    if not success:
+        reservation["status"] = "Failed for all Rooms"
+        print(f"Failed to make reservation for reservation {row_index} for all rooms")
 
 def run_reservation_script():
-    for row_index, row in enumerate(sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=8, values_only=True), start=2):
-        DATE = row[0]                           # Column A: Date
-        START_TIME = row[1]                     # Column B: Start Time
-        END_TIME = row[2]                       # Column C: End Time
-        ROOM_NUMBERS = row[3].split("|")        # Column D: Room Number                  # Column E: Level Number
-        TITLE = row[4]                          # Column E: Title
-        DESCRIPTION = row[5]                    # Column F: Description
-        PERSON_COUNT = row[6]                   # Column G: Person Count
-        STATUS = row[7]                         # Column H: Status
-        current_date = datetime.now().date()    # Get the current date
+    for row_index, reservation in enumerate(reservations):
+        DATE = reservation["date"]
+        START_TIME = reservation["start_time"]
+        END_TIME = reservation["end_time"]
+        ROOM_NUMBERS = reservation["room_numbers"]
+        TITLE = reservation["title"]
+        DESCRIPTION = reservation["description"]
+        PERSON_COUNT = reservation["person_count"]
+        STATUS = reservation["status"]
+        REPEAT = reservation["repeat"]
+        current_date = datetime.now().date()
         formated_date = datetime.strptime(DATE, '%Y-%m-%d').date()
-        
-        if STATUS in ["Success - Reservation for Room 0.40", "Success - Reservation for Room 0.42", "Success - Reservation for Room 0.43", "Success - Reservation for Room 0.46", "Success - Reservation for Room 0.47","Success - Reservation for Room 0.66", "Failed for all Rooms", "Skipped (Past)"]:
-            print(f"Skipping row {row_index} with status: {STATUS}")  # Skip rows with these statuses
-            continue
-        if (formated_date - current_date).days < 0:
-            sheet[f"H{row_index}"] = "Skipped (Past)"  # Write status in column H
-            print(f"Skipping row {row_index} with status: Skipped (Past)")  # Skip past dates
-            continue
-        if (formated_date - current_date).days > 14:
-            sheet[f"H{row_index}"] = "Skipped (Future)"  # Write status in column H
-            print(f"Skipping row {row_index} with status: Skipped (Future)")
+
+        if STATUS in ["Success - Reservation for Room 0.40", "Success - Reservation for Room 0.42", "Success - Reservation for Room 0.43", "Success - Reservation for Room 0.46", "Success - Reservation for Room 0.47", "Success - Reservation for Room 0.66", "Failed for all Rooms", "Skipped (Past)", "Skipped (Future)"]:
+            print(f"Skipping reservation {row_index} with status: {STATUS}")
             continue
 
-        for ROOM_NUMBER in ROOM_NUMBERS:
-            success = make_reservation(date=DATE, start_time=START_TIME, end_time=END_TIME, room_number=ROOM_NUMBER, title=TITLE, description=DESCRIPTION, person_count=PERSON_COUNT)  # Call the function to make the reservation
-            if success:
-                sheet[f"H{row_index}"] = f"Success - Reservation for Room {ROOM_NUMBER}"  # Write success status in column I
-                print(f"Successfully made reservation for row {row_index} for Room {ROOM_NUMBER}")
-                break  # Break the loop if the reservation was successful
-        if not success:
-            sheet[f"H{row_index}"] = "Failed for all Rooms"  # Write failure status in column H
-            print(f"Failed to make reservation for row {row_index} for all rooms")
-    workbook.save(excel_path)  # Save the workbook after making reservations
-    workbook.close()  # Close the workbook
-    print("Reservations completed. Workbook saved.")  # Print completion message
+        if (formated_date - current_date).days < 0:
+            if REPEAT == "no":
+                reservation["status"] = "Skipped (Past)"
+                print(f"Skipping reservation {row_index} with status: Skipped (Past)")
+                continue
+            else:
+                while (formated_date - current_date).days < 0:
+                    formated_date = formated_date + + timedelta(days=7) if REPEAT == "weekly" else formated_date + timedelta(days=14) if REPEAT == "biweekly" else formated_date
+                reserve_room(reservation, row_index, formated_date.strftime('%Y-%m-%d'), START_TIME, END_TIME, ROOM_NUMBERS, TITLE, DESCRIPTION, PERSON_COUNT)
+                formated_date = formated_date + timedelta(days=7) if REPEAT == "weekly" else formated_date + timedelta(days=14) if REPEAT == "biweekly" else formated_date
+
+        if (formated_date - current_date).days > 14:
+            reservation["status"] = "Skipped (Future)"
+            print(f"Skipping reservation {row_index} with status: Skipped (Future)")
+            continue
+
+        reserve_room(reservation, row_index, formated_date.strftime('%Y-%m-%d'), START_TIME, END_TIME, ROOM_NUMBERS, TITLE, DESCRIPTION, PERSON_COUNT)
+
+
+
+    # Save updated statuses back to the JSON file
+    with open(json_path, 'w') as json_file:
+        json.dump(reservations, json_file, indent=4)
+    print("Reservations completed. JSON file updated.")
 
 run_reservation_script()  # Run the script once at startup
 

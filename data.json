@@ -1,0 +1,56 @@
+[
+    {
+        "date": "2025-04-20",
+        "start_time": "08:00",
+        "end_time": "09:00",
+        "room_numbers": [
+            "0.66",
+            "0.46",
+            "0.43",
+            "0.42",
+            "0.47",
+            "0.40"
+        ],
+        "title": "Physik Lerngruppe",
+        "description": "Lerngruppe Physik",
+        "person_count": 5,
+        "status": "",
+        "repeat": "weekly"
+    },
+    {
+        "date": "2025-04-20",
+        "start_time": "09:00",
+        "end_time": "10:00",
+        "room_numbers": [
+            "0.66",
+            "0.46",
+            "0.43",
+            "0.42",
+            "0.47",
+            "0.40"
+        ],
+        "title": "Mathe Lerngruppe",
+        "description": "Lerngruppe Mathe",
+        "person_count": 5,
+        "status": "",
+        "repeat": "weekly"
+    },
+    {
+        "date": "2025-04-20",
+        "start_time": "10:00",
+        "end_time": "11:00",
+        "room_numbers": [
+            "0.66",
+            "0.46",
+            "0.43",
+            "0.42",
+            "0.47",
+            "0.40"
+        ],
+        "title": "Chemie Lerngruppe",
+        "description": "Lerngruppe Chemie",
+        "person_count": 5,
+        "status": "",
+        "repeat": "weekly"
+    }
+]
