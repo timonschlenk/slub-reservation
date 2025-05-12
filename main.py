@@ -102,7 +102,7 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
             EC.presence_of_element_located((By.ID, '_shib_idp_rememberConsent'))
         )  # Wait for the checkbox to be present
         SubmitButton3 = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'slubbutton'))
+            EC.presence_of_element_located((By.XPATH, '/input[@value="Accept"]'))
         )  # Wait for the submit button to be present
         
         Checkbox3.click()  # Click the checkbox
@@ -113,6 +113,7 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
 
         # Scroll down
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # Scroll to the bottom of the page
+
         driver.save_screenshot('after click 3.png')  # Save a screenshot of the page
 
 
