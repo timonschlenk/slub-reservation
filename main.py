@@ -76,10 +76,6 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     SubmitButton.click()  # Click the submit button
 
     time.sleep(5)  # Wait for the page to load
-    #find checkbox element
-    Checkbox = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By., 'reservation-terms-checkbox'))
-    )  # Wait for the checkbox to be present
     driver.save_screenshot('after click.png')  # Save a screenshot of the page
     # save the XML file
     with open('page_source.html', 'w', encoding='utf-8') as f:
