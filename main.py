@@ -81,7 +81,7 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     with open('page_source.html', 'w', encoding='utf-8') as f:
         f.write(driver.page_source)
     
-    if False:
+    try:
         # Check Checkbox
         Checkbox3 = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, 'accept'))
@@ -99,7 +99,10 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
         # Scroll down
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # Scroll to the bottom of the page
         driver.save_screenshot('after click 3.png')  # Save a screenshot of the page
-    if False:
+    except:
+        print("Checkbox not found, trying another one")
+
+    try:
         Checkbox3 = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, '_shib_idp_rememberConsent'))
         )  # Wait for the checkbox to be present
@@ -114,7 +117,8 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
         SubmitButton3.click()  # Click the submit button
         time.sleep(5)  # Wait for the page to load
         driver.save_screenshot('after click 2.png')  # Save a screenshot of the page
-
+    except:
+        print("Checkbox not found, Proceeding without it")
 
     TitleInput = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, 'reservation-title'))
