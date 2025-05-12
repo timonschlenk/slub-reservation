@@ -31,10 +31,11 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     LINK = generate_link(date=date, start_time=start_time, end_time=end_time, room_number=room_number)  # Generate the link for the reservation page
 
     # Setup Chrome options and service
-    service = Service(executable_path='/usr/bin/chromedriver')
-    #options = webdriver.Chrome()
+    #service = Service(executable_path='/usr/bin/chromedriver')
+    service = Service(executable_path='chromedriver.exe')  # Path to your chromedriver executable
+    options = webdriver.ChromeOptions()
     #options.add_argument('-headless')  # Run in headless mode (no GUI)
-    driver = webdriver.Chrome(service=service)  # Initialize the WebDriver
+    driver = webdriver.Chrome(service=service, options=options)  # Initialize the WebDriver
 
     # Load credentials from config file using a relative path
     config_path = os.path.join(os.path.dirname(__file__), './config.json')
@@ -68,6 +69,8 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
 
     UsernameInput.send_keys(USERNAME)  # Enter the username
     PasswordInput.send_keys(PASSWORD)  # Enter the password
+    driver.execute_script("arguments[0].scrollIntoView(true);", SubmitButton)  # Scroll to the submit button
+    time.sleep(10)  # Wait for the button to be in view
     SubmitButton.click()  # Click the submit button
 
     TitleInput = WebDriverWait(driver, 10).until(
@@ -93,6 +96,8 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     TitleInput.send_keys(title)  # Enter the title
     DescriptionInput.send_keys(description)  # Enter the description
     PersonCountInput.send_keys(f"{person_count}" + Keys.ENTER)  # Enter the person count
+    driver.execute_script("arguments[0].scrollIntoView(true);", ReservationTermsCheckbox)
+    time.sleep(10)  # Wait for the checkbox to be in view
     ReservationTermsCheckbox.click()  # Click the privacy checkbox
     SubmitButton2.click()  # Click the submit button
 
