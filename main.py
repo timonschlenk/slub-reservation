@@ -31,8 +31,8 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     LINK = generate_link(date=date, start_time=start_time, end_time=end_time, room_number=room_number)  # Generate the link for the reservation page
 
     # Setup Chrome options and service
-    #service = Service(executable_path='/usr/bin/chromedriver')
-    service = Service(executable_path='chromedriver.exe')  # Path to your chromedriver executable
+    service = Service(executable_path='/usr/bin/chromedriver')
+    #service = Service(executable_path='chromedriver.exe')  # Path to your chromedriver executable
     options = webdriver.ChromeOptions()
     #options.add_argument('-headless')  # Run in headless mode (no GUI)
     driver = webdriver.Chrome(service=service, options=options)  # Initialize the WebDriver
@@ -70,8 +70,13 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     UsernameInput.send_keys(USERNAME)  # Enter the username
     PasswordInput.send_keys(PASSWORD)  # Enter the password
     driver.execute_script("arguments[0].scrollIntoView(true);", SubmitButton)  # Scroll to the submit button
-    time.sleep(10)  # Wait for the button to be in view
+    time.sleep(4)  # Wait for the button to be in view
+    #make a screenshot
+    driver.save_screenshot('befor click.png')  # Save a screenshot of the page
     SubmitButton.click()  # Click the submit button
+
+    time.sleep(5)  # Wait for the page to load
+    driver.save_screenshot('after click.png')  # Save a screenshot of the page
 
     TitleInput = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, 'reservation-title'))
