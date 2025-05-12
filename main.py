@@ -44,6 +44,9 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     USERNAME = config['username']
     PASSWORD = config['password']
 
+    print(LINK)
+    print(USERNAME)
+    print(PASSWORD)
     # Execute the script
     driver.get(LINK)  # Open the reservation page
     SubmitButton = WebDriverWait(driver, 10).until(
