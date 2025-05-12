@@ -14,7 +14,7 @@ import os
 import sys
 from datetime import datetime, timedelta
 
-SYSTEM_IS_WINDOWS = True  # Set to True if running on Windows
+SYSTEM_IS_WINDOWS = False  # Set to True if running on Windows
 CHROMEDRIVER_PATH = './chromedriver.exe' if SYSTEM_IS_WINDOWS else '/usr/bin/chromedriver' # Path to your chromedriver executable
 
 # Load data from JSON file
@@ -220,12 +220,12 @@ def run_reservation_script():
 print("Starting reservation script...")
 run_reservation_script()  # Run the script once at startup
 
-# Schedule the script to run at every full hour
-schedule.every().hour.at(":00").do(run_reservation_script)
+# # Schedule the script to run at every full hour
+# schedule.every().hour.at(":00").do(run_reservation_script)
 
-print("Scheduler is running. Press Ctrl+C to stop.")
+# print("Scheduler is running. Press Ctrl+C to stop.")
 
-# Keep the script running
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# # Keep the script running
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)

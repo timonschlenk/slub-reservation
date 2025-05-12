@@ -14,7 +14,7 @@
         "title": "Physik Lerngruppe",
         "description": "Lerngruppe Physik",
         "person_count": 5,
-        "status": "Success - Reserved until 2025-04-27",
+        "status": "Success",
         "repeat": "weekly"
     },
     {
@@ -32,7 +32,7 @@
         "title": "Mathe Lerngruppe",
         "description": "Lerngruppe Mathe",
         "person_count": 5,
-        "status": "Success - until 2025-04-26",
+        "status": "Success",
         "repeat": "weekly"
     }
 ]
