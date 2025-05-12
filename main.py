@@ -32,9 +32,9 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
 
     # Setup Chrome options and service
     service = Service(executable_path='/usr/bin/chromedriver')
-    options = webdriver.Chrome()
-    options.add_argument('-headless')  # Run in headless mode (no GUI)
-    driver = webdriver.Chrome(service=service, options=options)  # Initialize the WebDriver
+    #options = webdriver.Chrome()
+    #options.add_argument('-headless')  # Run in headless mode (no GUI)
+    driver = webdriver.Chrome(service=service)  # Initialize the WebDriver
 
     # Load credentials from config file using a relative path
     config_path = os.path.join(os.path.dirname(__file__), './config.json')
