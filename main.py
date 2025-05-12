@@ -85,7 +85,7 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
         EC.presence_of_element_located((By.ID, 'accept'))
     )  # Wait for the checkbox to be present
     SubmitButton3 = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, 'slub-button'))
+        EC.presence_of_element_located((By.CLASS_NAME, 'slubbutton'))
     )  # Wait for the submit button to be present
     Checkbox3.click()  # Click the checkbox
     driver.save_screenshot('befor click 2.png')  # Save a screenshot of the page
