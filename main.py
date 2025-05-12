@@ -14,6 +14,9 @@ import os
 import sys
 from datetime import datetime, timedelta
 
+SYSTEM_IS_WINDOWS = True  # Set to True if running on Windows
+CHROMEDRIVER_PATH = './chromedriver.exe' if SYSTEM_IS_WINDOWS else '/usr/bin/chromedriver' # Path to your chromedriver executable
+
 # Load data from JSON file
 json_path = os.path.join(os.path.dirname(__file__), 'data.json')
 with open(json_path, 'r') as json_file:
@@ -33,12 +36,11 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     print("Generating link...")
     LINK = generate_link(date=date, start_time=start_time, end_time=end_time, room_number=room_number)  # Generate the link for the reservation page
     # Setup Chrome options and service
-    service = Service(executable_path='/usr/bin/chromedriver')
+    service = Service(executable_path=CHROMEDRIVER_PATH)
     #service = Service(executable_path='chromedriver.exe')  # Path to your chromedriver executable
     options = webdriver.ChromeOptions()
     #options.add_argument('-headless')  # Run in headless mode (no GUI)
     driver = webdriver.Chrome(service=service, options=options)  # Initialize the WebDriver
-
     # Load credentials from config file using a relative path
     config_path = os.path.join(os.path.dirname(__file__), './config.json')
     with open(config_path, 'r') as config_file:
@@ -137,7 +139,7 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     PersonCountInput.send_keys(f"{person_count}" + Keys.ENTER)  # Enter the person count
     driver.execute_script("arguments[0].scrollIntoView(true);", ReservationTermsCheckbox)
     print("Waiting for checkbox to be in view...")
-    time.sleep(5)  # Wait for the checkbox to be in view
+    time.sleep(2)  # Wait for the checkbox to be in view
     print("Submitting the form...")
     ReservationTermsCheckbox.click()  # Click the privacy checkbox
     SubmitButton2.click()  # Click the submit button
@@ -167,7 +169,7 @@ def reserve_room(reservation, row_index, DATE:str, START_TIME:str, END_TIME:str,
 
 def run_reservation_script():
     old_stdout = sys.stdout
-    log_file = open("message.log","w")
+    log_file = open(f"log/{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}.log","w")
     sys.stdout = log_file
 
     for row_index, reservation in enumerate(reservations):
