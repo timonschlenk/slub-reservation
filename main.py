@@ -70,12 +70,14 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     UsernameInput.send_keys(USERNAME)  # Enter the username
     PasswordInput.send_keys(PASSWORD)  # Enter the password
     driver.execute_script("arguments[0].scrollIntoView(true);", SubmitButton)  # Scroll to the submit button
-    time.sleep(4)  # Wait for the button to be in view
+    time.sleep(2)  # Wait for the button to be in view
     #make a screenshot
     driver.save_screenshot('befor click.png')  # Save a screenshot of the page
     SubmitButton.click()  # Click the submit button
-    time.sleep(5)  # Wait for the page to load
+    time.sleep(2)  # Wait for the page to load
     driver.save_screenshot('after click.png')  # Save a screenshot of the page
+    driver.get(LINK)  # Open the reservation page
+    time.sleep(2)  # Wait for the page to load
     with open('page_source.html', 'w', encoding='utf-8') as f:
         f.write(driver.page_source)
     
