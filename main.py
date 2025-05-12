@@ -11,6 +11,7 @@ import time
 import schedule
 import json
 import os
+import sys
 from datetime import datetime, timedelta
 
 # Load data from JSON file
@@ -28,8 +29,9 @@ def generate_link(date:str, start_time:str, end_time:str, room_number="0.66"):
     return f"{base_url}?rid={formated_room_number}&sid={level_number}&rd={date}&sd={date}{formated_start_time}&ed={date}{formated_end_time}"
 
 def make_reservation(date:str, start_time:str, end_time:str, room_number=20, title="Physik Lerngruppe", description="Hausaufgaben", person_count=1, pause=1):
+    
+    print("Generating link...")
     LINK = generate_link(date=date, start_time=start_time, end_time=end_time, room_number=room_number)  # Generate the link for the reservation page
-
     # Setup Chrome options and service
     service = Service(executable_path='/usr/bin/chromedriver')
     #service = Service(executable_path='chromedriver.exe')  # Path to your chromedriver executable
@@ -41,13 +43,10 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     config_path = os.path.join(os.path.dirname(__file__), './config.json')
     with open(config_path, 'r') as config_file:
         config = json.load(config_file)
-
     USERNAME = config['username']
     PASSWORD = config['password']
 
-    print(LINK)
-    print(USERNAME)
-    print(PASSWORD)
+    print("Logging in...")
     # Execute the script
     driver.get(LINK)  # Open the reservation page
     SubmitButton = WebDriverWait(driver, 10).until(
@@ -71,12 +70,10 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     PasswordInput.send_keys(PASSWORD)  # Enter the password
     driver.execute_script("arguments[0].scrollIntoView(true);", SubmitButton)  # Scroll to the submit button
     time.sleep(2)  # Wait for the button to be in view
-    #make a screenshot
-    driver.save_screenshot('befor click.png')  # Save a screenshot of the page
     SubmitButton.click()  # Click the submit button
     time.sleep(2)  # Wait for the page to load
-    driver.save_screenshot('after click.png')  # Save a screenshot of the page
     
+    print("Checking for first interrupt...")
     try:
         # Check Checkbox
         Checkbox3 = WebDriverWait(driver, 10).until(
@@ -87,17 +84,12 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
         )  # Wait for the submit button to be present
         
         Checkbox3.click()  # Click the checkbox
-        driver.save_screenshot('befor click 2.png')  # Save a screenshot of the page
         SubmitButton3.click()  # Click the submit button
-        time.sleep(5)  # Wait for the page to load
-        driver.save_screenshot('after click 2.png')  # Save a screenshot of the page
-
-        # Scroll down
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # Scroll to the bottom of the page
-        driver.save_screenshot('after click 3.png')  # Save a screenshot of the page
+        print("First interrupt found and handled")
     except:
-        print("Checkbox not found, trying another one")
-
+        print("First interrupt not found, Proceeding without it")
+    
+    print("Checking for second interrupt...")
     try:
         Checkbox3 = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, '_shib_idp_rememberConsent'))
@@ -109,17 +101,14 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
         Checkbox3.click()  # Click the checkbox
         # Scroll down
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # Scroll to the bottom of the page
-        driver.save_screenshot('befor click 2.png')  # Save a screenshot of the page
         SubmitButton3.click()  # Click the submit button
-        time.sleep(5)  # Wait for the page to load
-        driver.save_screenshot('after click 2.png')  # Save a screenshot of the page
+        print("Second interrupt found and handled")
     except:
-        print("Checkbox not found, Proceeding without it")
+        print("Second interrupt not found, Proceeding without it")
     
+    print("Continuing with reservation...")
     driver.get(LINK)  # Open the reservation page
     time.sleep(2)  # Wait for the page to load
-    with open('page_source.html', 'w', encoding='utf-8') as f:
-        f.write(driver.page_source)
 
     TitleInput = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, 'reservation-title'))
@@ -140,12 +129,16 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     SubmitButton2 = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CLASS_NAME, 'btn-primary'))
     )  # Wait for the submit button to be present
-
+    
+    
+    print("Found all elements, filling out the form...")
     TitleInput.send_keys(title)  # Enter the title
     DescriptionInput.send_keys(description)  # Enter the description
     PersonCountInput.send_keys(f"{person_count}" + Keys.ENTER)  # Enter the person count
     driver.execute_script("arguments[0].scrollIntoView(true);", ReservationTermsCheckbox)
-    time.sleep(10)  # Wait for the checkbox to be in view
+    print("Waiting for checkbox to be in view...")
+    time.sleep(5)  # Wait for the checkbox to be in view
+    print("Submitting the form...")
     ReservationTermsCheckbox.click()  # Click the privacy checkbox
     SubmitButton2.click()  # Click the submit button
 
@@ -153,7 +146,9 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     time.sleep(pause)
     sucess = True if driver.find_elements(By.CLASS_NAME, 'success') else False  # Check if the reservation was successful
     # Close the browser
+    print("Reservation was successful" if sucess else "Reservation failed")
     driver.quit()
+    print("Browser closed")
     return sucess  # Return the success status
     
 def reserve_room(reservation, row_index, DATE:str, START_TIME:str, END_TIME:str, ROOM_NUMBERS:str, TITLE="Physik Lerngruppe", DESCRIPTION="Hausaufgaben", PERSON_COUNT=3, REPEAT="no"):
@@ -164,13 +159,17 @@ def reserve_room(reservation, row_index, DATE:str, START_TIME:str, END_TIME:str,
                 reservation["status"] = f"Success"
             else:
                 reservation["status"] = f"Success"
-            print(f"Successfully made reservation for reservation {row_index} for Room {ROOM_NUMBER}")
+            print(f"Successfully made reservation {row_index} for Room {ROOM_NUMBER} on {DATE} from {START_TIME} to {END_TIME}")
             break
     if not success:
         reservation["status"] = "Failed for all Rooms"
         print(f"Failed to make reservation for reservation {row_index} for all rooms")
 
 def run_reservation_script():
+    old_stdout = sys.stdout
+    log_file = open("message.log","w")
+    sys.stdout = log_file
+
     for row_index, reservation in enumerate(reservations):
         DATE = reservation["date"]
         START_TIME = reservation["start_time"]
@@ -183,6 +182,7 @@ def run_reservation_script():
         REPEAT = reservation["repeat"]
         current_date = datetime.now().date()
         formated_date = datetime.strptime(DATE, '%Y-%m-%d').date()
+        print(f"Processing reservation {row_index} with status: {STATUS}...")
 
         if STATUS in ["Success", "Failed for all Rooms", "Skipped (Past)", "Skipped (Future)"]:
             print(f"Skipping reservation {row_index} with status: {STATUS}")
@@ -212,7 +212,10 @@ def run_reservation_script():
     with open(json_path, 'w') as json_file:
         json.dump(reservations, json_file, indent=4)
     print("Reservations completed. JSON file updated.")
+    sys.stdout = old_stdout
+    log_file.close()
 
+print("Starting reservation script...")
 run_reservation_script()  # Run the script once at startup
 
 # Schedule the script to run at every full hour
