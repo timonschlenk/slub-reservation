@@ -160,7 +160,7 @@ def reserve_room(reservation, row_index, DATE:str, START_TIME:str, END_TIME:str,
             if REPEAT == "no":
                 reservation["status"] = f"Success"
             else:
-                reservation["status"] = f"Success"
+                reservation["status"] = f"Success - Reserved until {DATE}"
             print(f"Successfully made reservation {row_index} for Room {ROOM_NUMBER} on {DATE} from {START_TIME} to {END_TIME}")
             break
     if not success:
