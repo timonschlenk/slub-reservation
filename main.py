@@ -193,11 +193,10 @@ def run_reservation_script():
         if STATUS[0:24] == "Success - Reserved until ":
             last_date = datetime.strptime(STATUS[25:], '%Y-%m-%d').date()
             if (current_date - last_date).days < 7:
-                print(f"Skipping reservation {row_index} with status: {STATUS}")
+                print(f"Skipping reservation {row_index} with status: Too soon to reserve again")
                 continue
             else:
-                print(f"Updating reservation {row_index} with status: {STATUS}")
-
+                print(f"Updating reservation {row_index}...")
 
         if (formated_date - current_date).days < 0:
             if REPEAT == "no":
