@@ -76,9 +76,6 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     SubmitButton.click()  # Click the submit button
     time.sleep(5)  # Wait for the page to load
     driver.save_screenshot('after click.png')  # Save a screenshot of the page
-    # save the XML file
-    with open('page_source.html', 'w', encoding='utf-8') as f:
-        f.write(driver.page_source)
     
     # Check Checkbox
     Checkbox3 = WebDriverWait(driver, 10).until(
@@ -93,6 +90,11 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     time.sleep(5)  # Wait for the page to load
     driver.save_screenshot('after click 2.png')  # Save a screenshot of the page
 
+    # Scroll down
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # Scroll to the bottom of the page
+    driver.save_screenshot('after click 3.png')  # Save a screenshot of the page
+    with open('page_source.html', 'w', encoding='utf-8') as f:
+        f.write(driver.page_source)
 
 
     TitleInput = WebDriverWait(driver, 10).until(
