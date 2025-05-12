@@ -99,7 +99,7 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
         driver.save_screenshot('after click 3.png')  # Save a screenshot of the page
     if True:
         Checkbox3 = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, '_shib_idp_consentOptions'))
+            EC.presence_of_element_located((By.ID, '_shib_idp_rememberConsent'))
         )  # Wait for the checkbox to be present
         SubmitButton3 = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'slubbutton'))
