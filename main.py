@@ -151,11 +151,14 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     driver.quit()
     return sucess  # Return the success status
     
-def reserve_room(reservation, row_index, DATE:str, START_TIME:str, END_TIME:str, ROOM_NUMBERS:str, TITLE="Physik Lerngruppe", DESCRIPTION="Hausaufgaben", PERSON_COUNT=3):
+def reserve_room(reservation, row_index, DATE:str, START_TIME:str, END_TIME:str, ROOM_NUMBERS:str, TITLE="Physik Lerngruppe", DESCRIPTION="Hausaufgaben", PERSON_COUNT=3, REPEAT="no"):
     for ROOM_NUMBER in ROOM_NUMBERS:
         success = make_reservation(date=DATE, start_time=START_TIME, end_time=END_TIME, room_number=ROOM_NUMBER, title=TITLE, description=DESCRIPTION, person_count=PERSON_COUNT)
         if success:
-            reservation["status"] = f"Success - Reservation for Room {ROOM_NUMBER}"
+            if REPEAT == "no":
+                reservation["status"] = f"Success"
+            else:
+                reservation["status"] = f"Success"
             print(f"Successfully made reservation for reservation {row_index} for Room {ROOM_NUMBER}")
             break
     if not success:
@@ -176,7 +179,7 @@ def run_reservation_script():
         current_date = datetime.now().date()
         formated_date = datetime.strptime(DATE, '%Y-%m-%d').date()
 
-        if STATUS in ["Success - Reservation for Room 0.40", "Success - Reservation for Room 0.42", "Success - Reservation for Room 0.43", "Success - Reservation for Room 0.46", "Success - Reservation for Room 0.47", "Success - Reservation for Room 0.66", "Failed for all Rooms", "Skipped (Past)", "Skipped (Future)"]:
+        if STATUS in ["Success", "Failed for all Rooms", "Skipped (Past)", "Skipped (Future)"]:
             print(f"Skipping reservation {row_index} with status: {STATUS}")
             continue
 
