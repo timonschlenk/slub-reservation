@@ -9,7 +9,7 @@ Folge den Schritten aus dem Tutorial: [Python Selenium Tutorial - Automate Websi
 1. Installiere eine aktuelle Version von Python
 2. Installiere Selenium und Schedule gebe dafür ins Terminal ein:
 ```terminal
-pip install seleniumS
+pip install selenium
 pip install schedule
 ```
 3. Installiere eine aktuelle Version von Google Chrome oder Firefox und den dazugehörigen Driver ([Chrome](https://sites.google.com/chromium.org/driver/), [Firefox](https://github.com/mozilla/geckodriver))

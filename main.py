@@ -39,7 +39,7 @@ def make_reservation(date:str, start_time:str, end_time:str, room_number=20, tit
     service = Service(executable_path=CHROMEDRIVER_PATH)
     #service = Service(executable_path='chromedriver.exe')  # Path to your chromedriver executable
     options = webdriver.ChromeOptions()
-    #options.add_argument('-headless')  # Run in headless mode (no GUI)
+    options.add_argument('--headless')  # Run in headless mode (no GUI)
     driver = webdriver.Chrome(service=service, options=options)  # Initialize the WebDriver
     # Load credentials from config file using a relative path
     config_path = os.path.join(os.path.dirname(__file__), './config.json')
@@ -205,7 +205,7 @@ def run_reservation_script():
                 continue
             else:
                 while (formated_date - current_date).days < 0:
-                    formated_date = formated_date + + timedelta(days=7) if REPEAT == "weekly" else formated_date + timedelta(days=14) if REPEAT == "biweekly" else formated_date
+                    formated_date = formated_date + timedelta(days=7) if REPEAT == "weekly" else formated_date + timedelta(days=14) if REPEAT == "biweekly" else formated_date
                 reserve_room(reservation, row_index, formated_date.strftime('%Y-%m-%d'), START_TIME, END_TIME, ROOM_NUMBERS, TITLE, DESCRIPTION, PERSON_COUNT)
                 formated_date = formated_date + timedelta(days=7) if REPEAT == "weekly" else formated_date + timedelta(days=14) if REPEAT == "biweekly" else formated_date
 
