@@ -164,8 +164,12 @@ def reserve_room(reservation, row_index, DATE:str, START_TIME:str, END_TIME:str,
             print(f"Successfully made reservation {row_index} for Room {ROOM_NUMBER} on {DATE} from {START_TIME} to {END_TIME}")
             break
     if not success:
-        reservation["status"] = "Failed for all Rooms"
-        print(f"Failed to make reservation for reservation {row_index} for all rooms")
+        if REPEAT == "no":
+            reservation["status"] = "Failed for all Rooms"
+            print(f"Failed to make reservation {row_index} for all rooms")
+        else:
+            reservation["status"] = f"Failed for all Rooms - until {DATE}"
+            print(f"Failed to make reservation {row_index} for all rooms, but will try again next week")
 
 def run_reservation_script():
     old_stdout = sys.stdout
@@ -192,6 +196,14 @@ def run_reservation_script():
 
         if STATUS[0:24] == "Success - Reserved until ":
             last_date = datetime.strptime(STATUS[25:], '%Y-%m-%d').date()
+            if (current_date - last_date).days < 7:
+                print(f"Skipping reservation {row_index} with status: Too soon to reserve again")
+                continue
+            else:
+                print(f"Updating reservation {row_index}...")
+        
+        if STATUS[0:28] == "Failed for all Rooms - until ":
+            last_date = datetime.strptime(STATUS[29:], '%Y-%m-%d').date()
             if (current_date - last_date).days < 7:
                 print(f"Skipping reservation {row_index} with status: Too soon to reserve again")
                 continue
